@@ -56,5 +56,22 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     restart: always
 
+  composer:
+    image: composer:latest
+    container_name: wp_composer
+    volumes:
+      - .:/app
+    working_dir: /app
+
+  node:
+    image: node:latest
+    container_name: wp_node
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+
 volumes:
   db_data:
