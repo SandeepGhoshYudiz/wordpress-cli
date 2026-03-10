@@ -48,9 +48,6 @@ jobs:
           docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp plugin list --allow-root
           docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp theme list --allow-root
 
-      - name: Run WP-CLI Info
-        run: docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp info --allow-root
-
       - name: Stop Docker Compose
         if: always()
         run: docker compose down
