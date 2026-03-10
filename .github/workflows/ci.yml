@@ -26,6 +26,9 @@ jobs:
           echo "WORDPRESS_ADMIN_PASSWORD=adminpassword" >> .env
           echo "WORDPRESS_ADMIN_EMAIL=admin@example.com" >> .env
 
+      - name: Check directory permissions
+        run: ls -la
+
       - name: Start Docker Compose
         run: docker compose up -d
 
