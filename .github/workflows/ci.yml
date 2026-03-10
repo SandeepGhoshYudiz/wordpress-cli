@@ -41,15 +41,15 @@ jobs:
       - name: Verify WordPress installation
         run: |
           # Check if WordPress is installed and responding
-          docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp core is-installed --allow-root
+          docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp core is-installed --allow-root
           
       - name: Verify Plugins and Themes
         run: |
-          docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp plugin list --allow-root
-          docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp theme list --allow-root
+          docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp plugin list --allow-root
+          docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp theme list --allow-root
 
       - name: Run WP-CLI Info
-        run: docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp info --allow-root
+        run: docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp info --allow-root
 
       - name: Stop Docker Compose
         if: always()

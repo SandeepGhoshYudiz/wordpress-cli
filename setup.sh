@@ -19,7 +19,7 @@ if [ -f .env ]; then
 fi
 
 echo "Waiting for database to be ready..."
-until docker compose exec db mysqladmin ping -h"localhost" -u$WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD --silent; do
+until docker compose exec --user root db mysqladmin ping -h"localhost" -u$WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD --silent; do
     printf "."
     sleep 2
 done
@@ -29,18 +29,18 @@ sleep 5
 
 # Check if WordPress is already installed
 echo "Checking if WordPress is installed..."
-if docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp core is-installed --allow-root 2>/dev/null; then
+if docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp core is-installed --allow-root 2>/dev/null; then
     echo "WordPress is already installed."
 else
     echo "Installing WordPress..."
     echo "--- Pulling WordPress Core ---"
-    docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp core download --allow-root --force --version=6.4.3
+    docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp core download --allow-root --force --version=6.4.3
     
     echo "--- Checking directory contents after download ---"
-    docker compose exec cli ls -la /var/www/html
+    docker compose exec --user root cli ls -la /var/www/html
     
     echo "--- Creating wp-config.php ---"
-    docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp config create --allow-root \
+    docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp config create --allow-root \
         --dbname="$WORDPRESS_DB_NAME" \
         --dbuser="$WORDPRESS_DB_USER" \
         --dbpass="$WORDPRESS_DB_PASSWORD" \
@@ -48,7 +48,7 @@ else
         --force
     
     echo "--- Running Installation ---"
-    docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp core install --allow-root \
+    docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp core install --allow-root \
         --url="$URL" \
         --title="$TITLE" \
         --admin_user="$ADMIN_USER" \
@@ -60,7 +60,7 @@ fi
 
 # Example: Install a plugin
 echo "Installing Akismet plugin..."
-docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp plugin install akismet --activate --allow-root
+docker compose exec --user root cli php -d memory_limit=512M /usr/local/bin/wp plugin install akismet --activate --allow-root
 
 echo "Setup complete!"
 echo "URL: $URL"
