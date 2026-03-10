@@ -1,0 +1,13 @@
+.env
+wp-config.php
+wp-admin/
+wp-includes/
+*.php
+!index.php
+!wp-content/
+wp-content/uploads/
+wp-content/cache/
+# Keep essential files
+!setup.sh
+!docker-compose.yml
+!.github/

@@ -18,7 +18,8 @@ until docker compose exec db mysqladmin ping -h"localhost" -u$WORDPRESS_DB_USER 
     sleep 2
 done
 
-echo -e "\nDatabase is ready!"
+echo -e "\nDatabase is ready! Waiting additional 5s for stability..."
+sleep 5
 
 # Check if WordPress is already installed
 if docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp core is-installed --allow-root 2>/dev/null; then
