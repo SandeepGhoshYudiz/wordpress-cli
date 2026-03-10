@@ -1,0 +1,53 @@
+name: CI/CD WordPress Setup
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: |
+          echo "WORDPRESS_DB_NAME=wordpress" >> .env
+          echo "WORDPRESS_DB_USER=wpadmin" >> .env
+          echo "WORDPRESS_DB_PASSWORD=wppassword" >> .env
+          echo "MYSQL_ROOT_PASSWORD=rootpassword" >> .env
+          echo "WORDPRESS_URL=http://localhost:8080" >> .env
+          echo "WORDPRESS_TITLE='WP-CLI Test Lab'" >> .env
+          echo "WORDPRESS_ADMIN_USER=admin" >> .env
+          echo "WORDPRESS_ADMIN_PASSWORD=adminpassword" >> .env
+          echo "WORDPRESS_ADMIN_EMAIL=admin@example.com" >> .env
+
+      - name: Start Docker Compose
+        run: docker compose up -d
+
+      - name: Run WordPress Setup Script
+        run: |
+          chmod +x setup.sh
+          # Pass environment variables explicitly to the script
+          ./setup.sh
+
+      - name: Verify WordPress installation
+        run: |
+          # Check if WordPress is installed and responding
+          docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp core is-installed --allow-root
+          
+      - name: Verify Plugins and Themes
+        run: |
+          docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp plugin list --allow-root
+          docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp theme list --allow-root
+
+      - name: Run WP-CLI Info
+        run: docker compose exec cli php -d memory_limit=512M /usr/local/bin/wp info --allow-root
+
+      - name: Stop Docker Compose
+        if: always()
+        run: docker compose down
